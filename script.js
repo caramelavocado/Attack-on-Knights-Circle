@@ -26,7 +26,7 @@ const shipImg = new Image();
 shipImg.src = "images/spaceShip.png";
 
 const bulletImg = new Image();
-bulletImg.src = "images/workOrder.png";
+bulletImg.src = "images/pencil.png";
 
 const obstacleImg = new Image();
 obstacleImg.src = "images/workOrder.png";
@@ -35,7 +35,7 @@ const bombImg = new Image();
 bombImg.src = "images/phone.png";
 
 const platformImg = new Image();
-platformImg.src = "images/workOrder.png";
+platformImg.src = "images/platform.png";
 
 const bossImg = new Image();
 bossImg.src = "images/godzilla.png";
