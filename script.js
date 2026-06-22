@@ -10,6 +10,7 @@ const gameOverSound = new Audio("sounds/gameover.mp3");
 const bgMusic = new Audio("sounds/background.mp3");
 bgMusic.loop = true;
 bgMusic.volume = 0.4;
+let gameWon = false;
 
 let keys = {};
 let level = 1;
@@ -154,6 +155,7 @@ function setupLevel4() {
 
   bossSound.loop = true;
   bossSound.currentTime = 0;
+  bgMusic.pause();
   bossSound.play();
 }
 
@@ -413,10 +415,13 @@ function updateLevel4() {
     }
 
     if (boss.health <= 0) {
+      if (!gameWon) {
+        gameWon = true;
+        bossSound.pause();
+        bgMusic.pause();
+        winSound.play();
+  }
 
-      bossSound.pause();
-      winSound.play();
-      
       ctx.fillStyle = "white";
       ctx.font = "35px Arial";
       ctx.fillText("YOU WIN!", 270, 220);
@@ -465,6 +470,7 @@ function restartGame() {
   lives = 3;
   score = 0;
   gameOver = false;
+  gameWon = false;
   startLevel();
   gameLoop();
 }
