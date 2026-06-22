@@ -47,8 +47,9 @@ let keys = {};
 let level = 1;
 let lives = 3;
 let score = 0;
-let gameOver = false;
-let gameWon = false;
+
+let gameState = "start";
+// start, playing, levelComplete, gameOver, win
 
 let player = {
   x: 50,
@@ -68,21 +69,31 @@ let bombs = [];
 let platforms = [];
 let boss = null;
 
-document.addEventListener("keydown", () => {
-  if (bgMusic.paused && level !== 4 && !gameOver && !gameWon) {
-    bgMusic.play();
-  }
-}, { once: true });
-
 document.addEventListener("keydown", e => {
   keys[e.key] = true;
 
-  if (e.key === " " && (level === 2 || level === 4) && !gameOver && !gameWon) {
-    shoot();
+  if (gameState === "start" && e.key === "Enter") {
+    gameState = "playing";
+    bgMusic.play();
+    startLevel();
   }
 
-  if (gameOver && e.key === "Enter") {
+  if (gameState === "levelComplete" && e.key === "Enter") {
+    level++;
+    gameState = "playing";
+    startLevel();
+  }
+
+  if (gameState === "gameOver" && e.key === "Enter") {
     restartGame();
+  }
+
+  if (gameState === "win" && e.key === "Enter") {
+    restartGame();
+  }
+
+  if (e.key === " " && gameState === "playing" && (level === 2 || level === 4)) {
+    shoot();
   }
 });
 
@@ -165,7 +176,6 @@ function setupLevel3() {
   player.y = 300;
   player.width = 45;
   player.height = 45;
-  player.vy = 0;
 
   platforms = [
     { x: 0, y: 420, width: 160, height: 30 },
@@ -217,6 +227,18 @@ function drawText() {
   gameInfo.textContent = `Level: ${level} | Lives: ${lives} | Score: ${score}`;
 }
 
+function drawScreen(title, subtitle, instructions) {
+  ctx.fillStyle = "white";
+  ctx.font = "36px Arial";
+  ctx.fillText(title, 180, 160);
+
+  ctx.font = "22px Arial";
+  ctx.fillText(subtitle, 140, 210);
+
+  ctx.font = "18px Arial";
+  ctx.fillText(instructions, 220, 260);
+}
+
 function movePlayer() {
   if (keys["ArrowLeft"]) player.x -= player.speed;
   if (keys["ArrowRight"]) player.x += player.speed;
@@ -261,7 +283,7 @@ function rectsCollide(a, b) {
 }
 
 function loseLife() {
-  if (gameOver || gameWon) return;
+  if (gameState !== "playing") return;
 
   hitSound.currentTime = 0;
   hitSound.play();
@@ -269,7 +291,7 @@ function loseLife() {
   lives--;
 
   if (lives <= 0) {
-    gameOver = true;
+    gameState = "gameOver";
     bgMusic.pause();
     bossSound.pause();
     gameOverSound.currentTime = 0;
@@ -279,9 +301,16 @@ function loseLife() {
   }
 }
 
-function nextLevel() {
-  level++;
-  startLevel();
+function completeLevel() {
+  bossSound.pause();
+
+  if (level === 4) {
+    gameState = "win";
+    winSound.currentTime = 0;
+    winSound.play();
+  } else {
+    gameState = "levelComplete";
+  }
 }
 
 function updateLevel1() {
@@ -324,7 +353,7 @@ function updateLevel1() {
   });
 
   if (hearts.length === 0) {
-    nextLevel();
+    completeLevel();
   }
 }
 
@@ -378,7 +407,7 @@ function updateLevel2() {
   });
 
   if (score >= 15) {
-    nextLevel();
+    completeLevel();
   }
 }
 
@@ -416,7 +445,7 @@ function updateLevel3() {
   }
 
   if (player.x > 650 && player.y < 300) {
-    nextLevel();
+    completeLevel();
   }
 }
 
@@ -461,17 +490,7 @@ function updateLevel4() {
     }
 
     if (boss.health <= 0) {
-      if (!gameWon) {
-        gameWon = true;
-        bossSound.pause();
-        bgMusic.pause();
-        winSound.currentTime = 0;
-        winSound.play();
-      }
-
-      ctx.fillStyle = "white";
-      ctx.font = "35px Arial";
-      ctx.fillText("YOU WIN!", 270, 220);
+      completeLevel();
       return;
     }
   }
@@ -489,16 +508,46 @@ function updateLevel4() {
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (gameOver) {
-    ctx.fillStyle = "white";
-    ctx.font = "30px Arial";
-    ctx.fillText("GAME OVER", 260, 190);
+  if (gameState === "start") {
+    drawScreen(
+      "PROPERTY QUEST",
+      "Complete all 4 levels with only 3 lives.",
+      "Press Enter to Start"
+    );
+    drawText();
+    requestAnimationFrame(gameLoop);
+    return;
+  }
 
-    ctx.font = "20px Arial";
-    ctx.fillText("Press Enter to Restart", 250, 230);
+  if (gameState === "levelComplete") {
+    drawScreen(
+      `LEVEL ${level} COMPLETE!`,
+      `Lives left: ${lives} | Score: ${score}`,
+      "Press Enter to Continue"
+    );
+    drawText();
+    requestAnimationFrame(gameLoop);
+    return;
+  }
 
-    gameInfo.textContent = `Level: ${level} | Lives: ${lives} | Score: ${score}`;
+  if (gameState === "gameOver") {
+    drawScreen(
+      "GAME OVER",
+      "You lost all 3 lives.",
+      "Press Enter to Restart"
+    );
+    drawText();
+    requestAnimationFrame(gameLoop);
+    return;
+  }
 
+  if (gameState === "win") {
+    drawScreen(
+      "YOU WIN!",
+      "You defeated the final boss!",
+      "Press Enter to Play Again"
+    );
+    drawText();
     requestAnimationFrame(gameLoop);
     return;
   }
@@ -508,10 +557,7 @@ function gameLoop() {
   if (level === 3) updateLevel3();
   if (level === 4) updateLevel4();
 
-  if (!gameWon) {
-    drawPlayer();
-  }
-
+  drawPlayer();
   drawText();
 
   requestAnimationFrame(gameLoop);
@@ -521,8 +567,7 @@ function restartGame() {
   level = 1;
   lives = 3;
   score = 0;
-  gameOver = false;
-  gameWon = false;
+  gameState = "playing";
 
   bossSound.pause();
   bossSound.currentTime = 0;
@@ -539,5 +584,4 @@ function restartGame() {
   startLevel();
 }
 
-startLevel();
 gameLoop();
