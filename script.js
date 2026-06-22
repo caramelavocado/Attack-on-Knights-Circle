@@ -51,6 +51,7 @@ let keys = {};
 let level = 1;
 let lives = 3;
 let score = 0;
+let level2Score = 0;
 
 let gameState = "start";
 
@@ -164,32 +165,32 @@ function drawScreen(title, subtitle, instructions) {
 function drawLevelIntro() {
   if (level === 1) {
     drawScreen(
-      "LEVEL 1: EVENT RUN",
-      "Collect all event proposals while avoiding angry residents.",
+      "Phase 1: EVENT RUN",
+      "Collect all the event proposals while avoiding angry residents",
       "Press Enter to Begin"
     );
   }
 
   if (level === 2) {
     drawScreen(
-      "LEVEL 2: SPACE OFFICE",
-      "Shoot work orders with pencils and dodge falling phones.",
+      "Phase 2: SPACE OFFICE",
+      "Complete work orders while dodging incolming calls",
       "Press Enter to Begin"
     );
   }
 
   if (level === 3) {
     drawScreen(
-      "LEVEL 3: PLATFORM ESCAPE",
-      "Jump across platforms, avoid obstacles, and do not fall.",
+      "Phase 3: APARTMENT ESCAPE",
+      "Give a tour of the apartments but avoid the leases",
       "Press Enter to Begin"
     );
   }
 
   if (level === 4) {
     drawScreen(
-      "LEVEL 4: BOSS FIGHT",
-      "Godzilla is waiting. Survive the final fight.",
+      "Phase 4: ?????",
+      "Show them who's boss",
       "Press Enter to Begin"
     );
   }
@@ -242,6 +243,8 @@ function setupLevel1() {
 }
 
 function setupLevel2() {
+  level2Score = 0;
+
   player.x = 330;
   player.y = 380;
   player.width = 45;
@@ -335,7 +338,11 @@ function drawPlayer() {
 }
 
 function drawText() {
-  gameInfo.textContent = `Level: ${level} | Lives: ${lives} | Score: ${score}`;
+  if (level === 2 && gameState === "playing") {
+    gameInfo.textContent = `Level: ${level} | Lives: ${lives} | Score: ${score} | Level 2 Hits: ${level2Score}/8`;
+  } else {
+    gameInfo.textContent = `Level: ${level} | Lives: ${lives} | Score: ${score}`;
+  }
 }
 
 function movePlayer() {
@@ -518,6 +525,7 @@ function updateLevel2() {
     for (let bullet of bullets) {
       if (rectsCollide(obs, bullet)) {
         score++;
+        level2Score++;
         bullet.y = -100;
         return false;
       }
@@ -525,7 +533,7 @@ function updateLevel2() {
     return true;
   });
 
-  if (score >= 15) {
+  if (level2Score >= 8) {
     completeLevel();
   }
 }
@@ -671,7 +679,7 @@ function gameLoop() {
   if (gameState === "start") {
     drawScreen(
       "PROPERTY QUEST",
-      "Complete all 4 levels with only 3 lives.",
+      "Complete all 4 levels with only 3 lives and win a prize at the end!",
       "Press Enter to Start"
     );
     drawText();
@@ -703,7 +711,7 @@ function gameLoop() {
   if (gameState === "gameOver") {
     drawScreen(
       "GAME OVER",
-      "You lost all 3 lives.",
+      "Booooo you lost all 3 lives",
       "Press Enter to Restart"
     );
     drawText();
@@ -716,7 +724,7 @@ function gameLoop() {
     drawScreen(
       "YOU WIN!",
       "You defeated the final boss!",
-      "Press Enter to Play Again"
+      "Go to the front of the Phase 1 office to collect your prize!"
     );
     drawText();
     drawFadeIn();
@@ -740,6 +748,7 @@ function restartGame() {
   level = 1;
   lives = 3;
   score = 0;
+  level2Score = 0;
   gameState = "start";
 
   bossSound.pause();
