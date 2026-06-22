@@ -26,7 +26,7 @@ const shipImg = new Image();
 shipImg.src = "images/spaceShip.png";
 
 const bulletImg = new Image();
-bulletImg.src = "images/pencil.png";
+bulletImg.src = "images/workOrder.png";
 
 const obstacleImg = new Image();
 obstacleImg.src = "images/workOrder.png";
@@ -35,7 +35,7 @@ const bombImg = new Image();
 bombImg.src = "images/phone.png";
 
 const platformImg = new Image();
-platformImg.src = "images/platform.png";
+platformImg.src = "images/workOrder.png";
 
 const bossImg = new Image();
 bossImg.src = "images/godzilla.png";
@@ -49,7 +49,6 @@ let lives = 3;
 let score = 0;
 let gameOver = false;
 let gameWon = false;
-let gameRunning = true;
 
 let player = {
   x: 50,
@@ -262,6 +261,8 @@ function rectsCollide(a, b) {
 }
 
 function loseLife() {
+  if (gameOver || gameWon) return;
+
   hitSound.currentTime = 0;
   hitSound.play();
 
