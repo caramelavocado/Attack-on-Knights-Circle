@@ -471,8 +471,15 @@ function restartGame() {
   score = 0;
   gameOver = false;
   gameWon = false;
+
+  bossSound.currentTime = 0;
+  
+  bgMusic.currentTime = 0;
+  bgMusic.play();
+
   startLevel();
   gameLoop();
+  requestAnimationFrame(gameLoop);
 }
 
 startLevel();
