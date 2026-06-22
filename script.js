@@ -491,10 +491,14 @@ function gameLoop() {
   if (gameOver) {
     ctx.fillStyle = "white";
     ctx.font = "30px Arial";
-    ctx.fillText("GAME OVER", 260, 200);
+    ctx.fillText("GAME OVER", 260, 190);
+
     ctx.font = "20px Arial";
-    ctx.fillText("Press Enter to Restart", 250, 240);
-    drawText();
+    ctx.fillText("Press Enter to Restart", 250, 230);
+
+    gameInfo.textContent = `Level: ${level} | Lives: ${lives} | Score: ${score}`;
+
+    requestAnimationFrame(gameLoop);
     return;
   }
 
@@ -509,9 +513,7 @@ function gameLoop() {
 
   drawText();
 
-  if (!gameOver) {
-    requestAnimationFrame(gameLoop);
-  }
+  requestAnimationFrame(gameLoop);
 }
 
 function restartGame() {
@@ -534,7 +536,6 @@ function restartGame() {
   bgMusic.play();
 
   startLevel();
-  requestAnimationFrame(gameLoop);
 }
 
 startLevel();
