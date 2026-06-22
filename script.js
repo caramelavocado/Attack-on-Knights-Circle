@@ -166,7 +166,7 @@ function drawLevelIntro() {
   if (level === 1) {
     drawScreen(
       "Phase 1: EVENT RUN",
-      "Collect all the event proposals while avoiding angry residents",
+      "Use the golf cart to collect all the event proposals while avoiding angry residents",
       "Press Enter to Begin"
     );
   }
@@ -174,7 +174,7 @@ function drawLevelIntro() {
   if (level === 2) {
     drawScreen(
       "Phase 2: SPACE OFFICE",
-      "Complete work orders while dodging incolming calls",
+      "Complete work orders while dodging incoming calls",
       "Press Enter to Begin"
     );
   }
@@ -182,7 +182,7 @@ function drawLevelIntro() {
   if (level === 3) {
     drawScreen(
       "Phase 3: APARTMENT ESCAPE",
-      "Give a tour of the apartments but avoid the leases",
+      "Give a tour of the apartments but avoid the unfinished leases",
       "Press Enter to Begin"
     );
   }
