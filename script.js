@@ -1,6 +1,15 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const gameInfo = document.getElementById("gameInfo");
+const collectSound = new Audio("sounds/collect.mp3");
+const hitSound = new Audio("sounds/hit.mp3");
+const shootSound = new Audio("sounds/shoot.mp3");
+const bossSound = new Audio("sounds/boss.mp3");
+const winSound = new Audio("sounds/win.mp3");
+const gameOverSound = new Audio("sounds/gameover.mp3");
+const bgMusic = new Audio("sounds/background.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.4;
 
 let keys = {};
 let level = 1;
@@ -25,6 +34,12 @@ let obstacles = [];
 let bombs = [];
 let platforms = [];
 let boss = null;
+
+document.addEventListener("keydown", () => {
+    if (bgMusic.paused) {
+        bgMusic.play();
+    }
+}, { once: true });
 
 document.addEventListener("keydown", e => {
   keys[e.key] = true;
@@ -166,6 +181,10 @@ function movePlayer() {
 }
 
 function shoot() {
+  
+  shootSound.currentTime = 0;
+  shootSound.play();
+
   bullets.push({
     x: player.x + player.width / 2 - 3,
     y: player.y,
@@ -185,6 +204,9 @@ function rectsCollide(a, b) {
 }
 
 function loseLife() {
+  hitSound.currentTime = 0;
+  hitSound.play();
+  
   lives--;
 
   if (lives <= 0) {
@@ -217,6 +239,8 @@ function updateLevel1() {
 
     if (rectsCollide(player, heartBox)) {
       score++;
+      collectSound.currentTime = 0;
+      collectSound.play();
       return false;
     }
 
@@ -340,6 +364,9 @@ function updateLevel3() {
 }
 
 function updateLevel4() {
+  bossSound.loop = true;
+  bossSound.play();
+  
   movePlayer();
 
   ctx.fillStyle = "yellow";
@@ -354,6 +381,8 @@ function updateLevel4() {
     boss.x += boss.speed;
 
     if (boss.x <= 0 || boss.x + boss.width >= canvas.width) {
+      bossSound.pause();
+      winSound.play();
       boss.speed *= -1;
     }
 
