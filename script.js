@@ -49,7 +49,7 @@ let lives = 3;
 let score = 0;
 
 let gameState = "start";
-// start, playing, levelComplete, gameOver, win
+// start, levelIntro, playing, levelComplete, gameOver, win
 
 let player = {
   x: 50,
@@ -73,22 +73,29 @@ document.addEventListener("keydown", e => {
   keys[e.key] = true;
 
   if (gameState === "start" && e.key === "Enter") {
+    gameState = "levelIntro";
+  }
+
+  else if (gameState === "levelIntro" && e.key === "Enter") {
     gameState = "playing";
-    bgMusic.play();
+
+    if (level !== 4 && bgMusic.paused) {
+      bgMusic.play();
+    }
+
     startLevel();
   }
 
-  if (gameState === "levelComplete" && e.key === "Enter") {
+  else if (gameState === "levelComplete" && e.key === "Enter") {
     level++;
-    gameState = "playing";
-    startLevel();
+    gameState = "levelIntro";
   }
 
-  if (gameState === "gameOver" && e.key === "Enter") {
+  else if (gameState === "gameOver" && e.key === "Enter") {
     restartGame();
   }
 
-  if (gameState === "win" && e.key === "Enter") {
+  else if (gameState === "win" && e.key === "Enter") {
     restartGame();
   }
 
@@ -229,14 +236,48 @@ function drawText() {
 
 function drawScreen(title, subtitle, instructions) {
   ctx.fillStyle = "white";
-  ctx.font = "36px Arial";
-  ctx.fillText(title, 180, 160);
+  ctx.font = "34px Arial";
+  ctx.fillText(title, 170, 145);
 
-  ctx.font = "22px Arial";
-  ctx.fillText(subtitle, 140, 210);
+  ctx.font = "21px Arial";
+  ctx.fillText(subtitle, 95, 205);
 
   ctx.font = "18px Arial";
-  ctx.fillText(instructions, 220, 260);
+  ctx.fillText(instructions, 230, 265);
+}
+
+function drawLevelIntro() {
+  if (level === 1) {
+    drawScreen(
+      "LEVEL 1: EVENT RUN",
+      "Collect all event proposals while avoiding angry residents.",
+      "Press Enter to Begin"
+    );
+  }
+
+  if (level === 2) {
+    drawScreen(
+      "LEVEL 2: SPACE OFFICE",
+      "Shoot work orders with pencils and dodge falling phones.",
+      "Press Enter to Begin"
+    );
+  }
+
+  if (level === 3) {
+    drawScreen(
+      "LEVEL 3: PLATFORM ESCAPE",
+      "Jump across platforms, avoid obstacles, and do not fall.",
+      "Press Enter to Begin"
+    );
+  }
+
+  if (level === 4) {
+    drawScreen(
+      "LEVEL 4: BOSS FIGHT",
+      "Defeat Godzilla by shooting while dodging attacks.",
+      "Press Enter to Begin"
+    );
+  }
 }
 
 function movePlayer() {
@@ -297,7 +338,7 @@ function loseLife() {
     gameOverSound.currentTime = 0;
     gameOverSound.play();
   } else {
-    startLevel();
+    gameState = "levelIntro";
   }
 }
 
@@ -510,10 +551,17 @@ function gameLoop() {
 
   if (gameState === "start") {
     drawScreen(
-      "Protect Knights Circle!",
-      "Complete all 4 levels with only 3 lives and unlock a special prize",
+      "PROPERTY QUEST",
+      "Complete all 4 levels with only 3 lives.",
       "Press Enter to Start"
     );
+    drawText();
+    requestAnimationFrame(gameLoop);
+    return;
+  }
+
+  if (gameState === "levelIntro") {
+    drawLevelIntro();
     drawText();
     requestAnimationFrame(gameLoop);
     return;
@@ -567,7 +615,7 @@ function restartGame() {
   level = 1;
   lives = 3;
   score = 0;
-  gameState = "playing";
+  gameState = "start";
 
   bossSound.pause();
   bossSound.currentTime = 0;
@@ -578,10 +626,8 @@ function restartGame() {
   winSound.pause();
   winSound.currentTime = 0;
 
+  bgMusic.pause();
   bgMusic.currentTime = 0;
-  bgMusic.play();
-
-  startLevel();
 }
 
 gameLoop();
