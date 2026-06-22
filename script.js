@@ -166,16 +166,17 @@ function drawLevelIntro() {
   if (level === 1) {
     drawScreen(
       "Phase 1: EVENT RUN",
-      "Use the golf cart to collect all the event proposals while avoiding angry residents",
+      "Collect all the event proposals while avoiding angry residents",
       "Press Enter to Begin"
     );
   }
 
   if (level === 2) {
     drawScreen(
-      "Phase 2: SPACE OFFICE",
+       "Phase 2: SPACE OFFICE",
       "Complete work orders while dodging incoming calls",
       "Press Enter to Begin"
+
     );
   }
 
@@ -184,6 +185,7 @@ function drawLevelIntro() {
       "Phase 3: APARTMENT ESCAPE",
       "Give a tour of the apartments but avoid the unfinished leases",
       "Press Enter to Begin"
+
     );
   }
 
@@ -192,6 +194,7 @@ function drawLevelIntro() {
       "Phase 4: ?????",
       "Show them who's boss",
       "Press Enter to Begin"
+
     );
   }
 }
@@ -303,7 +306,8 @@ function setupLevel4() {
     y: -130,
     width: 150,
     height: 120,
-    health: 10,
+    health: 25,
+    maxHealth: 25,
     speed: 3
   };
 
@@ -399,6 +403,38 @@ function drawSpeechBox(text) {
   ctx.fillStyle = "white";
   ctx.font = "18px Arial";
   ctx.fillText(text, canvas.width / 2, 345);
+  ctx.textAlign = "left";
+}
+
+function drawBossHealthBar() {
+  const barWidth = 300;
+  const barHeight = 25;
+  const x = (canvas.width - barWidth) / 2;
+  const y = 20;
+
+  ctx.fillStyle = "#333";
+  ctx.fillRect(x, y, barWidth, barHeight);
+
+  const currentWidth = (boss.health / boss.maxHealth) * barWidth;
+
+  if (boss.health > boss.maxHealth * 0.5) {
+    ctx.fillStyle = "green";
+  } else if (boss.health > boss.maxHealth * 0.25) {
+    ctx.fillStyle = "yellow";
+  } else {
+    ctx.fillStyle = "red";
+  }
+
+  ctx.fillRect(x, y, currentWidth, barHeight);
+
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x, y, barWidth, barHeight);
+
+  ctx.fillStyle = "white";
+  ctx.font = "16px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(`Godzilla HP: ${boss.health}/${boss.maxHealth}`, canvas.width / 2, 38);
   ctx.textAlign = "left";
 }
 
@@ -638,12 +674,20 @@ function updateLevel4() {
 
     ctx.drawImage(bossImg, boss.x, boss.y, boss.width, boss.height);
 
-    centerText("Boss HP: " + boss.health, 40, 18);
+    drawBossHealthBar();
 
     bullets.forEach(bullet => {
       if (rectsCollide(bullet, boss)) {
         boss.health--;
         bullet.y = -100;
+
+        if (boss.health === 15) {
+          boss.speed = 4;
+        }
+
+        if (boss.health === 8) {
+          boss.speed = 5;
+        }
       }
     });
 
@@ -653,7 +697,7 @@ function updateLevel4() {
         y: boss.y + boss.height,
         width: 35,
         height: 35,
-        speed: 4
+        speed: boss.health <= 8 ? 7 : 4
       });
     }
 
@@ -711,7 +755,7 @@ function gameLoop() {
   if (gameState === "gameOver") {
     drawScreen(
       "GAME OVER",
-      "Booooo you lost all 3 lives",
+      "Booooo you lost all 3 lives.",
       "Press Enter to Restart"
     );
     drawText();
