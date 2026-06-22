@@ -151,32 +151,32 @@ function drawScreen(title, subtitle, instructions) {
 function drawLevelIntro() {
   if (level === 1) {
     drawScreen(
-      "LEVEL 1: EVENT RUN",
-      "Collect all event proposals while avoiding angry residents.",
+      "Phase 1: EVENT RUN",
+      "Collect all the event proposals while avoiding angry residents.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 2) {
     drawScreen(
-      "LEVEL 2: SPACE OFFICE",
-      "Shoot work orders with pencils and dodge falling phones.",
+      "Phase 2: SPACE OFFICE",
+      "Complete work orders and dodge incoming phones calls.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 3) {
     drawScreen(
-      "LEVEL 3: PLATFORM ESCAPE",
-      "Jump across platforms, avoid obstacles, and do not fall.",
+      "Phase 3: APARTMENT ESCAPE",
+      "Give an apartment tour and dodge the leases.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 4) {
     drawScreen(
-      "LEVEL 4: BOSS FIGHT",
-      "Defeat Godzilla by shooting while dodging attacks.",
+      "Phase 4: FINAL FIGHT",
+      "Show them who's boss.",
       "Press Enter to Begin"
     );
   }
