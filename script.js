@@ -44,6 +44,9 @@ platformImg.src = "images/platform.png";
 const bossImg = new Image();
 bossImg.src = "images/godzilla.png";
 
+const bossBombImg = new Image();
+bossBombImg.src = "images/bossBomb.png";
+
 bgMusic.loop = true;
 bgMusic.volume = 0.4;
 
@@ -681,13 +684,6 @@ function updateLevel4() {
         boss.health--;
         bullet.y = -100;
 
-        if (boss.health === 15) {
-          boss.speed = 4;
-        }
-
-        if (boss.health === 8) {
-          boss.speed = 5;
-        }
       }
     });
 
@@ -697,7 +693,7 @@ function updateLevel4() {
         y: boss.y + boss.height,
         width: 35,
         height: 35,
-        speed: boss.health <= 8 ? 7 : 4
+        speed: 4
       });
     }
 
@@ -709,7 +705,7 @@ function updateLevel4() {
 
   bombs.forEach(bomb => {
     bomb.y += bomb.speed;
-    ctx.drawImage(bombImg, bomb.x, bomb.y, bomb.width, bomb.height);
+    ctx.drawImage(bossBombImg, bomb.x, bomb.y, bomb.width, bomb.height);
 
     if (rectsCollide(player, bomb)) {
       loseLife();
