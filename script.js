@@ -510,8 +510,8 @@ function gameLoop() {
 
   if (gameState === "start") {
     drawScreen(
-      "PROPERTY QUEST",
-      "Complete all 4 levels with only 3 lives.",
+      "Protect Knights Circle!",
+      "Complete all 4 levels with only 3 lives and unlock a special prize",
       "Press Enter to Start"
     );
     drawText();
