@@ -249,7 +249,7 @@ function drawScreen(title, subtitle, instructions) {
 function drawLevelIntro() {
   if (level === 1) {
     drawScreen(
-      "LEVEL 1: EVENT RUN",
+      "Phase 1: EVENT RUN",
       "Collect all event proposals while avoiding angry residents.",
       "Press Enter to Begin"
     );
@@ -257,24 +257,24 @@ function drawLevelIntro() {
 
   if (level === 2) {
     drawScreen(
-      "LEVEL 2: SPACE OFFICE",
-      "Shoot work orders with pencils and dodge falling phones.",
+      "Phase 2: SPACE OFFICE",
+      "Shoot down work orders and dodge the incoming phone calls.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 3) {
     drawScreen(
-      "LEVEL 3: PLATFORM ESCAPE",
-      "Jump across platforms, avoid obstacles, and do not fall.",
+      "Phase 3: APARTMENT ESCAPE",
+      "Give a tour of the apartments and avoid the obstacles.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 4) {
     drawScreen(
-      "LEVEL 4: BOSS FIGHT",
-      "Defeat Godzilla by shooting while dodging attacks.",
+      "Phase 4: FINAL FIGHT",
+      "Show them who's boss.",
       "Press Enter to Begin"
     );
   }
@@ -552,7 +552,7 @@ function gameLoop() {
   if (gameState === "start") {
     drawScreen(
       "PROPERTY QUEST",
-      "Complete all 4 levels with only 3 lives.",
+      "Complete all 4 levels with only 3 lives and win a prize at the end!",
       "Press Enter to Start"
     );
     drawText();
@@ -581,7 +581,7 @@ function gameLoop() {
   if (gameState === "gameOver") {
     drawScreen(
       "GAME OVER",
-      "You lost all 3 lives.",
+      "Boooooo you lost all 3 lives.",
       "Press Enter to Restart"
     );
     drawText();
@@ -593,7 +593,7 @@ function gameLoop() {
     drawScreen(
       "YOU WIN!",
       "You defeated the final boss!",
-      "Press Enter to Play Again"
+      "Go to the front of the Phase 1 office to collect your prize!"
     );
     drawText();
     requestAnimationFrame(gameLoop);
