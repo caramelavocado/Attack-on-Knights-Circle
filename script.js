@@ -49,7 +49,9 @@ let lives = 3;
 let score = 0;
 
 let gameState = "start";
-// start, levelIntro, playing, levelComplete, gameOver, win
+
+let fadeAlpha = 0;
+let fadingIn = false;
 
 let player = {
   x: 50,
@@ -74,6 +76,7 @@ document.addEventListener("keydown", e => {
 
   if (gameState === "start" && e.key === "Enter") {
     gameState = "levelIntro";
+    startFadeIn();
   }
 
   else if (gameState === "levelIntro" && e.key === "Enter") {
@@ -84,19 +87,23 @@ document.addEventListener("keydown", e => {
     }
 
     startLevel();
+    startFadeIn();
   }
 
   else if (gameState === "levelComplete" && e.key === "Enter") {
     level++;
     gameState = "levelIntro";
+    startFadeIn();
   }
 
   else if (gameState === "gameOver" && e.key === "Enter") {
     restartGame();
+    startFadeIn();
   }
 
   else if (gameState === "win" && e.key === "Enter") {
     restartGame();
+    startFadeIn();
   }
 
   if (e.key === " " && gameState === "playing" && (level === 2 || level === 4)) {
@@ -107,6 +114,73 @@ document.addEventListener("keydown", e => {
 document.addEventListener("keyup", e => {
   keys[e.key] = false;
 });
+
+function startFadeIn() {
+  fadeAlpha = 1;
+  fadingIn = true;
+}
+
+function drawFadeIn() {
+  if (fadingIn) {
+    ctx.fillStyle = `rgba(0, 0, 0, ${fadeAlpha})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    fadeAlpha -= 0.03;
+
+    if (fadeAlpha <= 0) {
+      fadeAlpha = 0;
+      fadingIn = false;
+    }
+  }
+}
+
+function centerText(text, y, size = 20) {
+  ctx.textAlign = "center";
+  ctx.fillStyle = "white";
+  ctx.font = `${size}px Arial`;
+  ctx.fillText(text, canvas.width / 2, y);
+  ctx.textAlign = "left";
+}
+
+function drawScreen(title, subtitle, instructions) {
+  centerText(title, 140, 36);
+  centerText(subtitle, 200, 22);
+  centerText(instructions, 260, 18);
+}
+
+function drawLevelIntro() {
+  if (level === 1) {
+    drawScreen(
+      "LEVEL 1: EVENT RUN",
+      "Collect all event proposals while avoiding angry residents.",
+      "Press Enter to Begin"
+    );
+  }
+
+  if (level === 2) {
+    drawScreen(
+      "LEVEL 2: SPACE OFFICE",
+      "Shoot work orders with pencils and dodge falling phones.",
+      "Press Enter to Begin"
+    );
+  }
+
+  if (level === 3) {
+    drawScreen(
+      "LEVEL 3: PLATFORM ESCAPE",
+      "Jump across platforms, avoid obstacles, and do not fall.",
+      "Press Enter to Begin"
+    );
+  }
+
+  if (level === 4) {
+    drawScreen(
+      "LEVEL 4: BOSS FIGHT",
+      "Defeat Godzilla by shooting while dodging attacks.",
+      "Press Enter to Begin"
+    );
+  }
+}
 
 function startLevel() {
   player.x = 50;
@@ -234,52 +308,6 @@ function drawText() {
   gameInfo.textContent = `Level: ${level} | Lives: ${lives} | Score: ${score}`;
 }
 
-function drawScreen(title, subtitle, instructions) {
-  ctx.fillStyle = "white";
-  ctx.font = "34px Arial";
-  ctx.fillText(title, 170, 145);
-
-  ctx.font = "21px Arial";
-  ctx.fillText(subtitle, 95, 205);
-
-  ctx.font = "18px Arial";
-  ctx.fillText(instructions, 230, 265);
-}
-
-function drawLevelIntro() {
-  if (level === 1) {
-    drawScreen(
-      "Phase 1: EVENT RUN",
-      "Collect all event proposals while avoiding angry residents.",
-      "Press Enter to Begin"
-    );
-  }
-
-  if (level === 2) {
-    drawScreen(
-      "Phase 2: SPACE OFFICE",
-      "Shoot down work orders and dodge the incoming phone calls.",
-      "Press Enter to Begin"
-    );
-  }
-
-  if (level === 3) {
-    drawScreen(
-      "Phase 3: APARTMENT ESCAPE",
-      "Give a tour of the apartments and avoid the obstacles.",
-      "Press Enter to Begin"
-    );
-  }
-
-  if (level === 4) {
-    drawScreen(
-      "Phase 4: FINAL FIGHT",
-      "Show them who's boss.",
-      "Press Enter to Begin"
-    );
-  }
-}
-
 function movePlayer() {
   if (keys["ArrowLeft"]) player.x -= player.speed;
   if (keys["ArrowRight"]) player.x += player.speed;
@@ -337,8 +365,10 @@ function loseLife() {
     bossSound.pause();
     gameOverSound.currentTime = 0;
     gameOverSound.play();
+    startFadeIn();
   } else {
     gameState = "levelIntro";
+    startFadeIn();
   }
 }
 
@@ -352,6 +382,8 @@ function completeLevel() {
   } else {
     gameState = "levelComplete";
   }
+
+  startFadeIn();
 }
 
 function updateLevel1() {
@@ -509,9 +541,7 @@ function updateLevel4() {
 
     ctx.drawImage(bossImg, boss.x, boss.y, boss.width, boss.height);
 
-    ctx.fillStyle = "white";
-    ctx.font = "18px Arial";
-    ctx.fillText("Boss HP: " + boss.health, 300, 40);
+    centerText("Boss HP: " + boss.health, 40, 18);
 
     bullets.forEach(bullet => {
       if (rectsCollide(bullet, boss)) {
@@ -552,10 +582,11 @@ function gameLoop() {
   if (gameState === "start") {
     drawScreen(
       "PROPERTY QUEST",
-      "Complete all 4 levels with only 3 lives and win a prize at the end!",
+      "Complete all 4 levels with only 3 lives.",
       "Press Enter to Start"
     );
     drawText();
+    drawFadeIn();
     requestAnimationFrame(gameLoop);
     return;
   }
@@ -563,6 +594,7 @@ function gameLoop() {
   if (gameState === "levelIntro") {
     drawLevelIntro();
     drawText();
+    drawFadeIn();
     requestAnimationFrame(gameLoop);
     return;
   }
@@ -574,6 +606,7 @@ function gameLoop() {
       "Press Enter to Continue"
     );
     drawText();
+    drawFadeIn();
     requestAnimationFrame(gameLoop);
     return;
   }
@@ -581,10 +614,11 @@ function gameLoop() {
   if (gameState === "gameOver") {
     drawScreen(
       "GAME OVER",
-      "Boooooo you lost all 3 lives.",
+      "You lost all 3 lives.",
       "Press Enter to Restart"
     );
     drawText();
+    drawFadeIn();
     requestAnimationFrame(gameLoop);
     return;
   }
@@ -593,9 +627,10 @@ function gameLoop() {
     drawScreen(
       "YOU WIN!",
       "You defeated the final boss!",
-      "Go to the front of the Phase 1 office to collect your prize!"
+      "Press Enter to Play Again"
     );
     drawText();
+    drawFadeIn();
     requestAnimationFrame(gameLoop);
     return;
   }
@@ -607,6 +642,7 @@ function gameLoop() {
 
   drawPlayer();
   drawText();
+  drawFadeIn();
 
   requestAnimationFrame(gameLoop);
 }
