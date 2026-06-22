@@ -8,6 +8,36 @@ const bossSound = new Audio("sounds/boss.mp3");
 const winSound = new Audio("sounds/win.mp3");
 const gameOverSound = new Audio("sounds/gameover.mp3");
 const bgMusic = new Audio("sounds/background.mp3");
+const playerImg = new Image();
+playerImg.src = "images/player.png";
+
+const heartImg = new Image();
+heartImg.src = "images/eventProposal.png";
+
+const cartImg = new Image();
+cartImg.src = "images/golfCart.png";
+
+const enemyImg = new Image();
+enemyImg.src = "images/angryResident.png";
+
+const shipImg = new Image();
+shipImg.src = "images/spaceShip.png";
+
+const bulletImg = new Image();
+bulletImg.src = "images/pencil.png";
+
+const obstacleImg = new Image();
+obstacleImg.src = "images/workOrder.png";
+
+const bombImg = new Image();
+bombImg.src = "images/phone.png";
+
+const platformImg = new Image();
+platformImg.src = "images/platform.png";
+
+const bossImg = new Image();
+bossImg.src = "images/godzilla.png";
+
 bgMusic.loop = true;
 bgMusic.volume = 0.4;
 let gameWon = false;
@@ -160,8 +190,13 @@ function setupLevel4() {
 }
 
 function drawPlayer() {
-  ctx.fillStyle = "#4dd2ff";
-  ctx.fillRect(player.x, player.y, player.width, player.height);
+ if (level === 1) {
+    ctx.drawImage(cartImg, player.x, player.y, player.width, player.height);
+   } else if (level === 2) {
+    ctx.drawImage(shipImg, player.x, player.y, player.width, player.height);
+    } else {
+    ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+  }
 }
 
 function drawText() {
@@ -233,9 +268,9 @@ function nextLevel() {
 function updateLevel1() {
   movePlayer();
 
-  ctx.fillStyle = "pink";
+
   hearts.forEach(heart => {
-    ctx.fillRect(heart.x, heart.y, heart.size, heart.size);
+    ctx.drawImage(heartImg, heart.x, heart.y, heart.size, heart.size);
   });
 
   hearts = hearts.filter(heart => {
@@ -256,7 +291,7 @@ function updateLevel1() {
     return true;
   });
 
-  ctx.fillStyle = "red";
+  ctx.drawImage(enemyImg, enemy.x, enemy.y, enemy.width, enemy.height);
   enemies.forEach(enemy => {
     enemy.y += enemy.speed;
 
@@ -264,7 +299,7 @@ function updateLevel1() {
       enemy.speed *= -1;
     }
 
-    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    ctx.drawImage(enemyImg, enemy.x, enemy.y, enemy.width, enemy.height);
 
     if (rectsCollide(player, enemy)) {
       loseLife();
@@ -279,18 +314,17 @@ function updateLevel1() {
 function updateLevel2() {
   movePlayer();
 
-  ctx.fillStyle = "yellow";
   bullets.forEach(bullet => {
     bullet.y -= bullet.speed;
-    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+    ctx.drawImage(bulletImg, bullet.x, bullet.y, bullet.width, bullet.height);
   });
 
   bullets = bullets.filter(bullet => bullet.y > 0);
 
-  ctx.fillStyle = "purple";
+
   obstacles.forEach(obs => {
     obs.y += obs.speed;
-    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+    ctx.drawImage(bombImg, bomb.x, bomb.y, bomb.width, bomb.height);
 
     if (obs.y > canvas.height) {
       obs.y = -30;
@@ -391,8 +425,7 @@ function updateLevel4() {
       boss.speed *= -1;
     }
 
-    ctx.fillStyle = "darkred";
-    ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+    ctx.drawImage(bossImg, boss.x, boss.y, boss.width, boss.height);
 
     ctx.fillStyle = "white";
     ctx.fillText("Boss HP: " + boss.health, 300, 40);
