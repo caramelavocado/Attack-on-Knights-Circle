@@ -9,6 +9,7 @@ const bossSound = new Audio("sounds/boss.mp3");
 const winSound = new Audio("sounds/win.mp3");
 const gameOverSound = new Audio("sounds/gameover.mp3");
 const bgMusic = new Audio("sounds/background.mp3");
+const roarSound = new Audio("sounds/roar.mp3");
 
 const playerImg = new Image();
 playerImg.src = "images/player.png";
@@ -30,6 +31,9 @@ bulletImg.src = "images/pencil.png";
 
 const obstacleImg = new Image();
 obstacleImg.src = "images/workOrder.png";
+
+const level3ObstacleImg = new Image();
+level3ObstacleImg.src = "images/level3Obstacle.png";
 
 const bombImg = new Image();
 bombImg.src = "images/phone.png";
@@ -71,6 +75,10 @@ let bombs = [];
 let platforms = [];
 let boss = null;
 
+let bossIntro = false;
+let bossTextTimer = 0;
+let bossPlatform = null;
+
 document.addEventListener("keydown", e => {
   keys[e.key] = true;
 
@@ -106,7 +114,12 @@ document.addEventListener("keydown", e => {
     startFadeIn();
   }
 
-  if (e.key === " " && gameState === "playing" && (level === 2 || level === 4)) {
+  if (
+    e.key === " " &&
+    gameState === "playing" &&
+    !bossIntro &&
+    (level === 2 || level === 4)
+  ) {
     shoot();
   }
 });
@@ -151,32 +164,32 @@ function drawScreen(title, subtitle, instructions) {
 function drawLevelIntro() {
   if (level === 1) {
     drawScreen(
-      "Phase 1: EVENT RUN",
-      "Collect all the event proposals while avoiding angry residents.",
+      "LEVEL 1: EVENT RUN",
+      "Collect all event proposals while avoiding angry residents.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 2) {
     drawScreen(
-      "Phase 2: SPACE OFFICE",
-      "Complete work orders and dodge incoming phones calls.",
+      "LEVEL 2: SPACE OFFICE",
+      "Shoot work orders with pencils and dodge falling phones.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 3) {
     drawScreen(
-      "Phase 3: APARTMENT ESCAPE",
-      "Give an apartment tour and dodge the leases.",
+      "LEVEL 3: PLATFORM ESCAPE",
+      "Jump across platforms, avoid obstacles, and do not fall.",
       "Press Enter to Begin"
     );
   }
 
   if (level === 4) {
     drawScreen(
-      "Phase 4: FINAL FIGHT",
-      "Show them who's boss.",
+      "LEVEL 4: BOSS FIGHT",
+      "Godzilla is waiting. Survive the final fight.",
       "Press Enter to Begin"
     );
   }
@@ -195,6 +208,9 @@ function startLevel() {
   bombs = [];
   platforms = [];
   boss = null;
+  bossPlatform = null;
+  bossIntro = false;
+  bossTextTimer = 0;
 
   if (level === 1) setupLevel1();
   if (level === 2) setupLevel2();
@@ -273,25 +289,39 @@ function setupLevel3() {
 
 function setupLevel4() {
   player.x = 330;
-  player.y = 380;
+  player.y = 360;
   player.width = 45;
   player.height = 45;
+  player.vy = 0;
+  player.onGround = false;
 
   boss = {
     x: 275,
-    y: 50,
+    y: -130,
     width: 150,
     height: 120,
     health: 10,
     speed: 3
   };
 
+  bossPlatform = {
+    x: 0,
+    y: 410,
+    width: canvas.width,
+    height: 40
+  };
+
   bombs = [];
 
+  bossIntro = true;
+  bossTextTimer = 180;
+
   bgMusic.pause();
-  bossSound.loop = true;
+  bossSound.pause();
   bossSound.currentTime = 0;
-  bossSound.play();
+
+  roarSound.currentTime = 0;
+  roarSound.play();
 }
 
 function drawPlayer() {
@@ -312,19 +342,19 @@ function movePlayer() {
   if (keys["ArrowLeft"]) player.x -= player.speed;
   if (keys["ArrowRight"]) player.x += player.speed;
 
-  if (level !== 3) {
+  if (level !== 3 && level !== 4) {
     if (keys["ArrowUp"]) player.y -= player.speed;
     if (keys["ArrowDown"]) player.y += player.speed;
   }
 
-  if (level === 3 && keys["ArrowUp"] && player.onGround) {
+  if ((level === 3 || level === 4) && keys["ArrowUp"] && player.onGround) {
     player.vy = -12;
     player.onGround = false;
   }
 
   player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
 
-  if (level !== 3) {
+  if (level !== 3 && level !== 4) {
     player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
   }
 }
@@ -351,6 +381,20 @@ function rectsCollide(a, b) {
   );
 }
 
+function drawSpeechBox(text) {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+  ctx.fillRect(70, 300, 560, 80);
+
+  ctx.strokeStyle = "white";
+  ctx.strokeRect(70, 300, 560, 80);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "white";
+  ctx.font = "18px Arial";
+  ctx.fillText(text, canvas.width / 2, 345);
+  ctx.textAlign = "left";
+}
+
 function loseLife() {
   if (gameState !== "playing") return;
 
@@ -363,6 +407,7 @@ function loseLife() {
     gameState = "gameOver";
     bgMusic.pause();
     bossSound.pause();
+    roarSound.pause();
     gameOverSound.currentTime = 0;
     gameOverSound.play();
     startFadeIn();
@@ -374,6 +419,7 @@ function loseLife() {
 
 function completeLevel() {
   bossSound.pause();
+  roarSound.pause();
 
   if (level === 4) {
     gameState = "win";
@@ -506,7 +552,7 @@ function updateLevel3() {
   });
 
   obstacles.forEach(obs => {
-    ctx.drawImage(obstacleImg, obs.x, obs.y, obs.width, obs.height);
+    ctx.drawImage(level3ObstacleImg, obs.x, obs.y, obs.width, obs.height);
 
     if (rectsCollide(player, obs)) {
       loseLife();
@@ -523,7 +569,50 @@ function updateLevel3() {
 }
 
 function updateLevel4() {
+  if (bossPlatform) {
+    ctx.drawImage(
+      platformImg,
+      bossPlatform.x,
+      bossPlatform.y,
+      bossPlatform.width,
+      bossPlatform.height
+    );
+  }
+
+  player.vy += 0.6;
+  player.y += player.vy;
+  player.onGround = false;
+
+  if (bossPlatform && rectsCollide(player, bossPlatform) && player.vy >= 0) {
+    player.y = bossPlatform.y - player.height;
+    player.vy = 0;
+    player.onGround = true;
+  }
+
   movePlayer();
+
+  if (bossIntro) {
+    boss.y += 1.2;
+
+    if (boss.y >= 50) {
+      boss.y = 50;
+    }
+
+    ctx.drawImage(bossImg, boss.x, boss.y, boss.width, boss.height);
+
+    drawSpeechBox("ROOOAR! You made it this far... but this property is mine!");
+
+    bossTextTimer--;
+
+    if (bossTextTimer <= 0) {
+      bossIntro = false;
+      bossSound.loop = true;
+      bossSound.currentTime = 0;
+      bossSound.play();
+    }
+
+    return;
+  }
 
   bullets.forEach(bullet => {
     bullet.y -= bullet.speed;
@@ -655,6 +744,9 @@ function restartGame() {
 
   bossSound.pause();
   bossSound.currentTime = 0;
+
+  roarSound.pause();
+  roarSound.currentTime = 0;
 
   gameOverSound.pause();
   gameOverSound.currentTime = 0;
