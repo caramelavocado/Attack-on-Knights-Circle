@@ -151,6 +151,10 @@ function setupLevel4() {
   };
 
   bombs = [];
+
+  bossSound.loop = true;
+  bossSound.currentTime = 0;
+  bossSound.play();
 }
 
 function drawPlayer() {
@@ -211,6 +215,9 @@ function loseLife() {
 
   if (lives <= 0) {
     gameOver = true;
+    bgMusic.pause();
+    bossSound.pause();
+    gameOverSound.play();
   } else {
     startLevel();
   }
@@ -364,9 +371,7 @@ function updateLevel3() {
 }
 
 function updateLevel4() {
-  bossSound.loop = true;
-  bossSound.play();
-  
+
   movePlayer();
 
   ctx.fillStyle = "yellow";
@@ -381,8 +386,6 @@ function updateLevel4() {
     boss.x += boss.speed;
 
     if (boss.x <= 0 || boss.x + boss.width >= canvas.width) {
-      bossSound.pause();
-      winSound.play();
       boss.speed *= -1;
     }
 
@@ -410,6 +413,10 @@ function updateLevel4() {
     }
 
     if (boss.health <= 0) {
+
+      bossSound.pause();
+      winSound.play();
+      
       ctx.fillStyle = "white";
       ctx.font = "35px Arial";
       ctx.fillText("YOU WIN!", 270, 220);
